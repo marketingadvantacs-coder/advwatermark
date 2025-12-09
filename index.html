@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Вотермарка ЭДВАНТА</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- pdf.js для работы с PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    if (window['pdfjsLib']) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+    }
+  </script>
+
+  <!-- JSZip для скачивания ZIP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+    .app {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px 16px 24px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+    p.desc {
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: #555;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .controls label {
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    input[type="file"] {
+      font-size: 13px;
+    }
+    input[type="range"] {
+      width: 160px;
+    }
+    input[type="number"] {
+      width: 70px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+    }
+    button {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.05s ease, box-shadow 0.1s ease, background 0.15s ease;
+    }
+    button.primary {
+      background: #ce122d;
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(206,18,45,0.35);
+    }
+    button.primary:disabled {
+      background: #ccc;
+      box-shadow: none;
+      cursor: default;
+    }
+    button.secondary {
+      background: #eee;
+      color: #333;
+    }
+    button:not(:disabled):active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .info-line {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 8px;
+    }
+    .preview-wrap {
+      margin-top: 8px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #555;
+    }
+    canvas#previewCanvas {
+      max-width: 100%;
+      border-radius: 6px;
+      background: #fff;
+    }
+    .hint {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
+    .status {
+      font-size: 12px;
+      margin-top: 4px;
+      color: #555;
+    }
+    .status.error { color: #c00; }
+
+    @media (max-width: 600px) {
+      .controls { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Вотермарка ЭДВАНТА</h1>
+    <p class="desc">
+      Загрузи файл, выбери прозрачность — и скачай страницы с диагональной бегущей строкой «ЭДВАНТА».
+    </p>
+
+    <div class="controls">
+      <label>
+        Файл
+        <input type="file" id="fileInput" accept=".pdf,image/png,image/jpeg">
+      </label>
+
+      <label>
+        Прозрачность
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="range" id="opacityInput" min="0" max="1" step="0.05" value="0.2">
+          <span id="opacityValue">0.2</span>
+        </div>
+      </label>
+
+      <label>
+        Страница
+        <div style="display:flex;align-items:center;gap:4px;">
+          <input type="number" id="pageInput" min="1" value="1">
+          <span id="pagesTotal"></span>
+        </div>
+      </label>
+
+      <button class="secondary" id="reloadBtn" type="button">
+        Обновить превью
+      </button>
+
+      <button class="primary" id="downloadBtn" type="button" disabled>
+        Скачать все JPG
+      </button>
+    </div>
+
+    <div class="info-line">
+      Поддерживаемые форматы: <b>PDF</b>, <b>PNG</b>, <b>JPG/JPEG</b>.<br>
+      Если у тебя DOCX или PPTX — сначала сохрани их как PDF, а потом загрузи сюда.
+    </div>
+
+    <div class="preview-wrap" id="previewBlock" style="display:none;">
+      <div class="preview-header">
+        <span id="previewTitle">Превью</span>
+        <span id="previewSize"></span>
+      </div>
+      <canvas id="previewCanvas"></canvas>
+      <div class="hint">
+        Меняй прозрачность и номер страницы — вотермарка обновляется в режиме превью.
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const opacityInput = document.getElementById('opacityInput');
+    const opacityValue = document.getElementById('opacityValue');
+    const pageInput = document.getElementById('pageInput');
+    const pagesTotal = document.getElementById('pagesTotal');
+    const previewCanvas = document.getElementById('previewCanvas');
+    const previewBlock = document.getElementById('previewBlock');
+    const previewTitle = document.getElementById('previewTitle');
+    const previewSize = document.getElementById('previewSize');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
+    const statusEl = document.getElementById('status');
+
+    let basePages = [];    // canvas без вотермарки
+    let currentFileName = null;
+    let watermarkImg = new Image();
+    let watermarkReady = false;
+
+    // грузим watermark.png рядом с index.html
+    watermarkImg.onload = () => { watermarkReady = true; };
+    watermarkImg.onerror = () => {
+      watermarkReady = false;
+      setStatus("Не удалось загрузить watermark.png — положи файл вотермарки рядом с index.html", true);
+    };
+    watermarkImg.src = "watermark.png";
+
+    function setStatus(text, isError) {
+      statusEl.textContent = text || "";
+      statusEl.classList.toggle('error', !!isError);
+    }
+
+    function clearData() {
+      basePages = [];
+      currentFileName = null;
+      pageInput.value = 1;
+      pageInput.min = 1;
+      pageInput.max = 1;
+      pagesTotal.textContent = "";
+      downloadBtn.disabled = true;
+      previewBlock.style.display = "none";
+      previewSize.textContent = "";
+    }
+
+    function updateOpacityText() {
+      opacityValue.textContent = opacityInput.value;
+    }
+
+    async function handleFile(file) {
+      clearData();
+      if (!file) return;
+
+      currentFileName = file.name;
+      setStatus("Загружаю файл...", false);
+
+      const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+      const isImage = file.type.startsWith("image/");
+
+      if (!isPdf && !isImage) {
+        setStatus("Нужен PDF, PNG или JPG/JPEG.", true);
+        return;
+      }
+
+      try {
+        if (isPdf) {
+          await loadPdfFile(file);
+        } else if (isImage) {
+          await loadImageFile(file);
+        }
+
+        if (basePages.length === 0) {
+          setStatus("Не удалось прочитать страницы файла.", true);
+          return;
+        }
+
+        pageInput.min = 1;
+        pageInput.max = basePages.length;
+        pageInput.value = 1;
+        pagesTotal.textContent = "/ " + basePages.length;
+
+        downloadBtn.disabled = false;
+        previewBlock.style.display = "block";
+        previewTitle.textContent = "Превью — страница 1";
+
+        await drawPreview();
+        setStatus("Готово. Можно настраивать прозрачность и скачивать.", false);
+      } catch (e) {
+        console.error(e);
+        setStatus("Ошибка обработки файла: " + (e.message || e), true);
+      }
+    }
+
+    function loadPdfFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const pdf = await pdfjsLib.getDocument({ data }).promise;
+            const numPages = pdf.numPages;
+            basePages = [];
+
+            for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+              const page = await pdf.getPage(pageNum);
+              const viewport = page.getViewport({ scale: 1.5 });
+
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+              canvas.width = viewport.width;
+              canvas.height = viewport.height;
+
+              await page.render({ canvasContext: ctx, viewport }).promise;
+              basePages.push(canvas);
+            }
+
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        };
+        reader.onerror = () => reject(new Error("Ошибка чтения PDF"));
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function loadImageFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            basePages = [canvas];
+            resolve();
+          };
+          img.onerror = () => reject(new Error("Не удалось загрузить картинку"));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error("Ошибка чтения изображения"));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Рисуем вотермарку твоей картинкой watermark.png
+    function drawWatermark(ctx, width, height, opacity) {
+      if (!watermarkReady) return;
+
+      ctx.save();
+      ctx.globalAlpha = opacity;
+
+      // масштабируем watermark так, чтобы он целиком перекрывал страницу
+      const w = watermarkImg.width;
+      const h = watermarkImg.height;
+      const scale = Math.max(width / w, height / h);
+      const dw = w * scale;
+      const dh = h * scale;
+      const dx = (width - dw) / 2;
+      const dy = (height - dh) / 2;
+
+      ctx.drawImage(watermarkImg, dx, dy, dw, dh);
+      ctx.restore();
+    }
+
+    async function drawPreview() {
+      if (basePages.length === 0) return;
+
+      const pageIndex = Math.min(
+        Math.max(parseInt(pageInput.value || "1", 10) - 1, 0),
+        basePages.length - 1
+      );
+      const baseCanvas = basePages[pageIndex];
+
+      const width = baseCanvas.width;
+      const height = baseCanvas.height;
+      const opacity = parseFloat(opacityInput.value);
+
+      previewCanvas.width = width;
+      previewCanvas.height = height;
+
+      const ctx = previewCanvas.getContext("2d");
+      ctx.clearRect(0, 0, width, height);
+      ctx.drawImage(baseCanvas, 0, 0);
+
+      drawWatermark(ctx, width, height, opacity);
+
+      previewTitle.textContent = "Превью — страница " + (pageIndex + 1);
+      previewSize.textContent = width + " x " + height + " px";
+    }
+
+    async function downloadAllPages() {
+      if (basePages.length === 0) return;
+      if (!window.JSZip) {
+        setStatus("JSZip не загрузился, проверь интернет.", true);
+        return;
+      }
+
+      const zip = new JSZip();
+      const opacity = parseFloat(opacityInput.value);
+
+      setStatus("Готовлю JPG и собираю ZIP...", false);
+      downloadBtn.disabled = true;
+
+      try {
+        const tasks = basePages.map((baseCanvas, idx) => {
+          return new Promise(resolve => {
+            const w = baseCanvas.width;
+            const h = baseCanvas.height;
+            const tmp = document.createElement("canvas");
+            const ctx = tmp.getContext("2d");
+            tmp.width = w;
+            tmp.height = h;
+            ctx.drawImage(baseCanvas, 0, 0);
+            drawWatermark(ctx, w, h, opacity);
+
+            tmp.toBlob(blob => {
+              if (blob) {
+                const name = "page_" + (idx + 1) + ".jpg";
+                zip.file(name, blob);
+              }
+              resolve();
+            }, "image/jpeg", 0.9);
+          });
+        });
+
+        await Promise.all(tasks);
+
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        const cleanName = (currentFileName || "document").replace(/\.[^.]+$/, "");
+        a.download = cleanName + "_watermarked.zip";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        setStatus("ZIP с вотермарками скачан.", false);
+      } catch (e) {
+        console.error(e);
+        setStatus("Ошибка при сборке ZIP: " + (e.message || e), true);
+      } finally {
+        downloadBtn.disabled = false;
+      }
+    }
+
+    // события
+    fileInput.addEventListener("change", e => {
+      const file = e.target.files[0];
+      handleFile(file);
+    });
+
+    opacityInput.addEventListener("input", () => {
+      updateOpacityText();
+      drawPreview();
+    });
+
+    pageInput.addEventListener("change", () => {
+      drawPreview();
+    });
+
+    reloadBtn.addEventListener("click", () => {
+      drawPreview();
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      downloadAllPages();
+    });
+
+    updateOpacityText();
+  </script>
+</body>
+</html>
