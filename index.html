@@ -27,29 +27,27 @@
       --adv-grey: rgb(168, 174, 177);
       --bg-glass: rgba(255, 255, 255, 0.14);
       --border-glass: rgba(255, 255, 255, 0.55);
-      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.18);
+      --shadow-soft: 0 14px 32px rgba(0, 0, 0, 0.18);
     }
 
     body {
       margin: 0;
       min-height: 100vh;
-      padding: 16px;
+      padding: 12px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #121212;
       background:
         radial-gradient(circle at 0% 0%, rgba(206, 18, 45, 0.16), transparent 55%),
-        radial-gradient(circle at 100% 100%, rgba(168, 174, 177, 0.16), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(168, 174, 177, 0.18), transparent 55%),
         linear-gradient(135deg, #f5f6f7, #ffffff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .app {
       width: 100%;
-      max-width: 980px;
-      padding: 20px 20px 26px;
-      border-radius: 24px;
+      max-width: 960px;
+      margin: 8px auto 20px;
+      padding: 16px 14px 22px;
+      border-radius: 22px;
       background: var(--bg-glass);
       border: 1px solid var(--border-glass);
       box-shadow: var(--shadow-soft);
@@ -67,7 +65,7 @@
         linear-gradient(
           135deg,
           rgba(255, 255, 255, 0.22),
-          rgba(255, 255, 255, 0.02)
+          rgba(255, 255, 255, 0.03)
         );
       pointer-events: none;
       mix-blend-mode: screen;
@@ -80,10 +78,20 @@
 
     h1 {
       margin: 0 0 6px;
-      font-size: 22px;
+      font-size: 18px;
       letter-spacing: 0.03em;
       text-transform: uppercase;
       color: #111;
+    }
+
+    @media (min-width: 720px) {
+      h1 {
+        font-size: 22px;
+      }
+      .app {
+        padding: 20px 20px 26px;
+        border-radius: 24px;
+      }
     }
 
     .badge {
@@ -91,7 +99,7 @@
       align-items: center;
       gap: 6px;
       padding: 4px 10px;
-      border-radius: 99px;
+      border-radius: 999px;
       border: 1px solid rgba(206, 18, 45, 0.28);
       background: radial-gradient(circle at 0 0, rgba(206,18,45,0.16), transparent 60%);
       font-size: 11px;
@@ -108,18 +116,26 @@
     }
 
     p.desc {
-      margin: 0 0 16px;
+      margin: 0 0 14px;
       font-size: 13px;
-      color: rgba(0,0,0,0.72);
+      color: rgba(0,0,0,0.75);
       max-width: 640px;
     }
 
     .controls {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: flex-end;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
       margin-bottom: 14px;
+    }
+
+    @media (min-width: 720px) {
+      .controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
     }
 
     .controls label {
@@ -127,38 +143,40 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      color: rgba(0,0,0,0.85);
+      color: rgba(0,0,0,0.88);
     }
 
     .field-shell {
-      padding: 6px 8px;
+      padding: 7px 9px;
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.7);
       border: 1px solid rgba(255,255,255,0.9);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      width: 100%;
     }
 
     input[type="file"] {
       font-size: 12px;
       border: none;
       background: transparent;
+      width: 100%;
     }
 
     input[type="range"] {
-      width: 160px;
+      width: 100%;
       accent-color: var(--adv-red);
     }
 
     input[type="number"] {
-      width: 70px;
+      width: 72px;
       padding: 4px 6px;
       border-radius: 10px;
       border: 1px solid rgba(168,174,177,0.7);
       font-size: 12px;
-      background: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.9);
       color: #111;
     }
 
@@ -169,13 +187,14 @@
     }
 
     button {
-      padding: 8px 16px;
+      padding: 10px 16px;
       border-radius: 999px;
       border: none;
       cursor: pointer;
       font-size: 13px;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
       transition: transform 0.06s ease, box-shadow 0.12s ease, background 0.15s ease, color 0.15s ease;
       position: relative;
@@ -187,6 +206,7 @@
                   linear-gradient(135deg, var(--adv-red), rgb(156, 9, 32));
       color: #fff;
       box-shadow: 0 10px 24px rgba(206,18,45,0.55);
+      width: 100%;
     }
 
     button.primary:disabled {
@@ -197,10 +217,18 @@
     }
 
     button.secondary {
-      background: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.9);
       color: #222;
       border: 1px solid rgba(168,174,177,0.65);
       box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+      width: 100%;
+    }
+
+    @media (min-width: 720px) {
+      button.primary,
+      button.secondary {
+        width: auto;
+      }
     }
 
     button:not(:disabled):active {
@@ -208,7 +236,7 @@
       box-shadow: 0 3px 10px rgba(0,0,0,0.25);
     }
 
-    button span.dot {
+    .btn-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
@@ -217,11 +245,11 @@
 
     .info-line {
       font-size: 11px;
-      color: rgba(0,0,0,0.6);
+      color: rgba(0,0,0,0.65);
       margin-bottom: 8px;
       padding: 6px 10px;
       border-radius: 12px;
-      background: rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.82);
       border: 1px dashed rgba(168,174,177,0.7);
     }
 
@@ -254,11 +282,11 @@
     .preview-wrap {
       margin-top: 10px;
       border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.9);
-      background: radial-gradient(circle at 0 0, rgba(255,255,255,0.55), rgba(255,255,255,0.8));
+      border: 1px solid rgba(255,255,255,0.95);
+      background: radial-gradient(circle at 0 0, rgba(255,255,255,0.7), rgba(255,255,255,0.9));
       box-shadow: 0 10px 28px rgba(0,0,0,0.14);
       padding: 10px 10px 14px;
-      display: flex;
+      display: none;
       flex-direction: column;
       gap: 8px;
     }
@@ -268,7 +296,7 @@
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
-      color: rgba(0,0,0,0.76);
+      color: rgba(0,0,0,0.8);
     }
 
     .preview-header-left {
@@ -300,24 +328,11 @@
     .status {
       font-size: 12px;
       margin-top: 6px;
-      color: rgba(0,0,0,0.75);
+      color: rgba(0,0,0,0.78);
     }
 
     .status.error {
       color: var(--adv-red);
-    }
-
-    @media (max-width: 720px) {
-      .app {
-        padding: 16px 14px 22px;
-        border-radius: 20px;
-      }
-      h1 {
-        font-size: 18px;
-      }
-      .controls {
-        align-items: stretch;
-      }
     }
   </style>
 </head>
@@ -352,14 +367,14 @@
 
         <label>
           Страница
-          <div class="field-shell">
+          <div class="field-shell" style="max-width: 140px;">
             <input type="number" id="pageInput" min="1" value="1">
             <span id="pagesTotal"></span>
           </div>
         </label>
 
         <button class="secondary" id="reloadBtn" type="button">
-          <span class="dot"></span>
+          <span class="btn-dot"></span>
           Обновить превью
         </button>
 
@@ -373,12 +388,12 @@
       </div>
 
       <div class="chips-row">
-        <div class="chip red">Вотермарка: watermark.png (диагональная бегущая строка ЭДВАНТА)</div>
+        <div class="chip red">Вотермарка: файл <b>watermark.png</b></div>
         <div class="chip">Каждая страница → отдельный JPG</div>
-        <div class="chip">ZIP-архив на выходе</div>
+        <div class="chip">На выходе ZIP-архив</div>
       </div>
 
-      <div class="preview-wrap" id="previewBlock" style="display:none;">
+      <div class="preview-wrap" id="previewBlock">
         <div class="preview-header">
           <div class="preview-header-left">
             <span class="preview-dot"></span>
@@ -473,4 +488,202 @@
 
         pageInput.min = 1;
         pageInput.max = basePages.length;
-        pageInput.val
+        pageInput.value = 1;
+        pagesTotal.textContent = "/ " + basePages.length;
+
+        downloadBtn.disabled = false;
+        previewBlock.style.display = "flex";
+        previewTitle.textContent = "Превью — страница 1";
+
+        await drawPreview();
+        setStatus("Готово. Можно настраивать прозрачность и скачивать.", false);
+      } catch (e) {
+        console.error(e);
+        setStatus("Ошибка обработки файла: " + (e.message || e), true);
+      }
+    }
+
+    function loadPdfFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const pdf = await pdfjsLib.getDocument({ data }).promise;
+            const numPages = pdf.numPages;
+            basePages = [];
+
+            for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+              const page = await pdf.getPage(pageNum);
+              const viewport = page.getViewport({ scale: 1.5 });
+
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+              canvas.width = viewport.width;
+              canvas.height = viewport.height;
+
+              await page.render({ canvasContext: ctx, viewport }).promise;
+              basePages.push(canvas);
+            }
+
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        };
+        reader.onerror = () => reject(new Error("Ошибка чтения PDF"));
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function loadImageFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            basePages = [canvas];
+            resolve();
+          };
+          img.onerror = () => reject(new Error("Не удалось загрузить картинку"));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error("Ошибка чтения изображения"));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Рисуем вотермарку картинкой watermark.png
+    function drawWatermark(ctx, width, height, opacity) {
+      if (!watermarkReady) return;
+
+      ctx.save();
+      ctx.globalAlpha = opacity;
+
+      const w = watermarkImg.width;
+      const h = watermarkImg.height;
+      const scale = Math.max(width / w, height / h);
+      const dw = w * scale;
+      const dh = h * scale;
+      const dx = (width - dw) / 2;
+      const dy = (height - dh) / 2;
+
+      ctx.drawImage(watermarkImg, dx, dy, dw, dh);
+      ctx.restore();
+    }
+
+    async function drawPreview() {
+      if (basePages.length === 0) return;
+
+      const pageIndex = Math.min(
+        Math.max(parseInt(pageInput.value || "1", 10) - 1, 0),
+        basePages.length - 1
+      );
+      const baseCanvas = basePages[pageIndex];
+
+      const width = baseCanvas.width;
+      const height = baseCanvas.height;
+      const opacity = parseFloat(opacityInput.value);
+
+      previewCanvas.width = width;
+      previewCanvas.height = height;
+
+      const ctx = previewCanvas.getContext("2d");
+      ctx.clearRect(0, 0, width, height);
+      ctx.drawImage(baseCanvas, 0, 0);
+
+      drawWatermark(ctx, width, height, opacity);
+
+      previewTitle.textContent = "Превью — страница " + (pageIndex + 1);
+      previewSize.textContent = width + " × " + height + " px";
+    }
+
+    async function downloadAllPages() {
+      if (basePages.length === 0) return;
+      if (!window.JSZip) {
+        setStatus("JSZip не загрузился, проверь интернет.", true);
+        return;
+      }
+
+      const zip = new JSZip();
+      const opacity = parseFloat(opacityInput.value);
+
+      setStatus("Готовлю JPG и собираю ZIP…", false);
+      downloadBtn.disabled = true;
+
+      try {
+        const tasks = basePages.map((baseCanvas, idx) => {
+          return new Promise(resolve => {
+            const w = baseCanvas.width;
+            const h = baseCanvas.height;
+            const tmp = document.createElement("canvas");
+            const ctx = tmp.getContext("2d");
+            tmp.width = w;
+            tmp.height = h;
+            ctx.drawImage(baseCanvas, 0, 0);
+            drawWatermark(ctx, w, h, opacity);
+
+            tmp.toBlob(blob => {
+              if (blob) {
+                const name = "page_" + (idx + 1) + ".jpg";
+                zip.file(name, blob);
+              }
+              resolve();
+            }, "image/jpeg", 0.9);
+          });
+        });
+
+        await Promise.all(tasks);
+
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        const cleanName = (currentFileName || "document").replace(/\.[^.]+$/, "");
+        a.download = cleanName + "_watermarked.zip";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        setStatus("ZIP с вотермарками скачан.", false);
+      } catch (e) {
+        console.error(e);
+        setStatus("Ошибка при сборке ZIP: " + (e.message || e), true);
+      } finally {
+        downloadBtn.disabled = false;
+      }
+    }
+
+    // события
+    fileInput.addEventListener("change", e => {
+      const file = e.target.files[0];
+      handleFile(file);
+    });
+
+    opacityInput.addEventListener("input", () => {
+      updateOpacityText();
+      drawPreview();
+    });
+
+    pageInput.addEventListener("change", () => {
+      drawPreview();
+    });
+
+    reloadBtn.addEventListener("click", () => {
+      drawPreview();
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      downloadAllPages();
+    });
+
+    updateOpacityText();
+  </script>
+</body>
+</html>
