@@ -18,57 +18,156 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --adv-red: rgb(206, 18, 45);
+      --adv-grey: rgb(168, 174, 177);
+      --bg-glass: rgba(255, 255, 255, 0.14);
+      --border-glass: rgba(255, 255, 255, 0.55);
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.18);
+    }
+
     body {
       margin: 0;
+      min-height: 100vh;
       padding: 16px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f5;
-      color: #222;
+      color: #121212;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(206, 18, 45, 0.16), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(168, 174, 177, 0.16), transparent 55%),
+        linear-gradient(135deg, #f5f6f7, #ffffff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
     .app {
-      max-width: 1000px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 10px;
-      padding: 16px 16px 24px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      width: 100%;
+      max-width: 980px;
+      padding: 20px 20px 26px;
+      border-radius: 24px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      position: relative;
+      overflow: hidden;
     }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.22),
+          rgba(255, 255, 255, 0.02)
+        );
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .app-inner {
+      position: relative;
+      z-index: 1;
+    }
+
     h1 {
-      margin: 0 0 8px;
-      font-size: 20px;
+      margin: 0 0 6px;
+      font-size: 22px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #111;
     }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid rgba(206, 18, 45, 0.28);
+      background: radial-gradient(circle at 0 0, rgba(206,18,45,0.16), transparent 60%);
+      font-size: 11px;
+      color: rgba(0,0,0,0.72);
+      margin-bottom: 10px;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--adv-red);
+      box-shadow: 0 0 0 3px rgba(206,18,45,0.26);
+    }
+
     p.desc {
       margin: 0 0 16px;
-      font-size: 14px;
-      color: #555;
+      font-size: 13px;
+      color: rgba(0,0,0,0.72);
+      max-width: 640px;
     }
+
     .controls {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      align-items: center;
-      margin-bottom: 12px;
+      align-items: flex-end;
+      margin-bottom: 14px;
     }
+
     .controls label {
-      font-size: 13px;
+      font-size: 12px;
       display: flex;
       flex-direction: column;
       gap: 4px;
+      color: rgba(0,0,0,0.85);
     }
+
+    .field-shell {
+      padding: 6px 8px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     input[type="file"] {
-      font-size: 13px;
+      font-size: 12px;
+      border: none;
+      background: transparent;
     }
+
     input[type="range"] {
       width: 160px;
+      accent-color: var(--adv-red);
     }
+
     input[type="number"] {
       width: 70px;
       padding: 4px 6px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 13px;
+      border-radius: 10px;
+      border: 1px solid rgba(168,174,177,0.7);
+      font-size: 12px;
+      background: rgba(255,255,255,0.85);
+      color: #111;
     }
+
+    input[type="number"]:focus,
+    input[type="file"]:focus-visible {
+      outline: 1px solid rgba(206,18,45,0.6);
+      outline-offset: 1px;
+    }
+
     button {
       padding: 8px 16px;
       border-radius: 999px;
@@ -78,125 +177,223 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: transform 0.05s ease, box-shadow 0.1s ease, background 0.15s ease;
+      transition: transform 0.06s ease, box-shadow 0.12s ease, background 0.15s ease, color 0.15s ease;
+      position: relative;
+      overflow: hidden;
     }
+
     button.primary {
-      background: #ce122d;
+      background: radial-gradient(circle at 0 0, rgba(255,255,255,0.28), transparent 55%),
+                  linear-gradient(135deg, var(--adv-red), rgb(156, 9, 32));
       color: #fff;
-      box-shadow: 0 3px 10px rgba(206,18,45,0.35);
+      box-shadow: 0 10px 24px rgba(206,18,45,0.55);
     }
+
     button.primary:disabled {
-      background: #ccc;
+      background: linear-gradient(135deg, #c9cdd1, #b7bcc0);
       box-shadow: none;
       cursor: default;
+      color: rgba(255,255,255,0.9);
     }
+
     button.secondary {
-      background: #eee;
-      color: #333;
+      background: rgba(255,255,255,0.85);
+      color: #222;
+      border: 1px solid rgba(168,174,177,0.65);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
     }
+
     button:not(:disabled):active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
     }
+
+    button span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.8);
+    }
+
     .info-line {
-      font-size: 12px;
-      color: #777;
+      font-size: 11px;
+      color: rgba(0,0,0,0.6);
       margin-bottom: 8px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.75);
+      border: 1px dashed rgba(168,174,177,0.7);
     }
+
+    .info-line b {
+      color: #000;
+    }
+
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    .chip {
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(168,174,177,0.16);
+      border: 1px solid rgba(168,174,177,0.4);
+      color: rgba(0,0,0,0.7);
+    }
+
+    .chip.red {
+      border-color: rgba(206,18,45,0.7);
+      color: rgb(110, 8, 26);
+      background: rgba(206,18,45,0.06);
+    }
+
     .preview-wrap {
-      margin-top: 8px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      background: #fafafa;
-      padding: 12px;
+      margin-top: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.9);
+      background: radial-gradient(circle at 0 0, rgba(255,255,255,0.55), rgba(255,255,255,0.8));
+      box-shadow: 0 10px 28px rgba(0,0,0,0.14);
+      padding: 10px 10px 14px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
+
     .preview-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
-      color: #555;
+      color: rgba(0,0,0,0.76);
     }
+
+    .preview-header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preview-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--adv-red);
+    }
+
     canvas#previewCanvas {
       max-width: 100%;
-      border-radius: 6px;
+      border-radius: 12px;
       background: #fff;
+      border: 1px solid rgba(168,174,177,0.3);
     }
+
     .hint {
       font-size: 11px;
-      color: #888;
-      margin-top: 4px;
+      color: rgba(0,0,0,0.6);
+      margin-top: 2px;
     }
+
     .status {
       font-size: 12px;
-      margin-top: 4px;
-      color: #555;
+      margin-top: 6px;
+      color: rgba(0,0,0,0.75);
     }
-    .status.error { color: #c00; }
 
-    @media (max-width: 600px) {
-      .controls { align-items: flex-start; }
+    .status.error {
+      color: var(--adv-red);
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        padding: 16px 14px 22px;
+        border-radius: 20px;
+      }
+      h1 {
+        font-size: 18px;
+      }
+      .controls {
+        align-items: stretch;
+      }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <h1>Вотермарка ЭДВАНТА</h1>
-    <p class="desc">
-      Загрузи файл, выбери прозрачность — и скачай страницы с диагональной бегущей строкой «ЭДВАНТА».
-    </p>
-
-    <div class="controls">
-      <label>
-        Файл
-        <input type="file" id="fileInput" accept=".pdf,image/png,image/jpeg">
-      </label>
-
-      <label>
-        Прозрачность
-        <div style="display:flex;align-items:center;gap:6px;">
-          <input type="range" id="opacityInput" min="0" max="1" step="0.05" value="0.2">
-          <span id="opacityValue">0.2</span>
-        </div>
-      </label>
-
-      <label>
-        Страница
-        <div style="display:flex;align-items:center;gap:4px;">
-          <input type="number" id="pageInput" min="1" value="1">
-          <span id="pagesTotal"></span>
-        </div>
-      </label>
-
-      <button class="secondary" id="reloadBtn" type="button">
-        Обновить превью
-      </button>
-
-      <button class="primary" id="downloadBtn" type="button" disabled>
-        Скачать все JPG
-      </button>
-    </div>
-
-    <div class="info-line">
-      Поддерживаемые форматы: <b>PDF</b>, <b>PNG</b>, <b>JPG/JPEG</b>.<br>
-      Если у тебя DOCX или PPTX — сначала сохрани их как PDF, а потом загрузи сюда.
-    </div>
-
-    <div class="preview-wrap" id="previewBlock" style="display:none;">
-      <div class="preview-header">
-        <span id="previewTitle">Превью</span>
-        <span id="previewSize"></span>
+    <div class="app-inner">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Вотермарка для документов ЭДВАНТА
       </div>
-      <canvas id="previewCanvas"></canvas>
-      <div class="hint">
-        Меняй прозрачность и номер страницы — вотермарка обновляется в режиме превью.
-      </div>
-    </div>
 
-    <div class="status" id="status"></div>
+      <h1>Диагональная бегущая строка</h1>
+      <p class="desc">
+        Загрузи файл, выбери прозрачность — и скачай все страницы в JPG с диагональной вотермаркой «ЭДВАНТА».
+      </p>
+
+      <div class="controls">
+        <label>
+          Файл
+          <div class="field-shell">
+            <input type="file" id="fileInput" accept=".pdf,image/png,image/jpeg">
+          </div>
+        </label>
+
+        <label>
+          Прозрачность
+          <div class="field-shell">
+            <input type="range" id="opacityInput" min="0" max="1" step="0.05" value="0.2">
+            <span id="opacityValue">0.2</span>
+          </div>
+        </label>
+
+        <label>
+          Страница
+          <div class="field-shell">
+            <input type="number" id="pageInput" min="1" value="1">
+            <span id="pagesTotal"></span>
+          </div>
+        </label>
+
+        <button class="secondary" id="reloadBtn" type="button">
+          <span class="dot"></span>
+          Обновить превью
+        </button>
+
+        <button class="primary" id="downloadBtn" type="button" disabled>
+          Скачать все JPG
+        </button>
+      </div>
+
+      <div class="info-line">
+        Поддерживаемые форматы: <b>PDF</b>, <b>PNG</b>, <b>JPG/JPEG</b>. Если исходник в DOCX или PPTX — сначала сохрани его как PDF.
+      </div>
+
+      <div class="chips-row">
+        <div class="chip red">Вотермарка: watermark.png (диагональная бегущая строка ЭДВАНТА)</div>
+        <div class="chip">Каждая страница → отдельный JPG</div>
+        <div class="chip">ZIP-архив на выходе</div>
+      </div>
+
+      <div class="preview-wrap" id="previewBlock" style="display:none;">
+        <div class="preview-header">
+          <div class="preview-header-left">
+            <span class="preview-dot"></span>
+            <span id="previewTitle">Превью</span>
+          </div>
+          <span id="previewSize"></span>
+        </div>
+        <canvas id="previewCanvas"></canvas>
+        <div class="hint">
+          Меняй прозрачность и номер страницы — картинка в превью обновится с новой вотермаркой.
+        </div>
+      </div>
+
+      <div class="status" id="status"></div>
+    </div>
   </div>
 
   <script>
@@ -252,7 +449,7 @@
       if (!file) return;
 
       currentFileName = file.name;
-      setStatus("Загружаю файл...", false);
+      setStatus("Загружаю файл…", false);
 
       const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
       const isImage = file.type.startsWith("image/");
@@ -276,203 +473,4 @@
 
         pageInput.min = 1;
         pageInput.max = basePages.length;
-        pageInput.value = 1;
-        pagesTotal.textContent = "/ " + basePages.length;
-
-        downloadBtn.disabled = false;
-        previewBlock.style.display = "block";
-        previewTitle.textContent = "Превью — страница 1";
-
-        await drawPreview();
-        setStatus("Готово. Можно настраивать прозрачность и скачивать.", false);
-      } catch (e) {
-        console.error(e);
-        setStatus("Ошибка обработки файла: " + (e.message || e), true);
-      }
-    }
-
-    function loadPdfFile(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-          try {
-            const data = new Uint8Array(e.target.result);
-            const pdf = await pdfjsLib.getDocument({ data }).promise;
-            const numPages = pdf.numPages;
-            basePages = [];
-
-            for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-              const page = await pdf.getPage(pageNum);
-              const viewport = page.getViewport({ scale: 1.5 });
-
-              const canvas = document.createElement("canvas");
-              const ctx = canvas.getContext("2d");
-              canvas.width = viewport.width;
-              canvas.height = viewport.height;
-
-              await page.render({ canvasContext: ctx, viewport }).promise;
-              basePages.push(canvas);
-            }
-
-            resolve();
-          } catch (err) {
-            reject(err);
-          }
-        };
-        reader.onerror = () => reject(new Error("Ошибка чтения PDF"));
-        reader.readAsArrayBuffer(file);
-      });
-    }
-
-    function loadImageFile(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            basePages = [canvas];
-            resolve();
-          };
-          img.onerror = () => reject(new Error("Не удалось загрузить картинку"));
-          img.src = e.target.result;
-        };
-        reader.onerror = () => reject(new Error("Ошибка чтения изображения"));
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // Рисуем вотермарку твоей картинкой watermark.png
-    function drawWatermark(ctx, width, height, opacity) {
-      if (!watermarkReady) return;
-
-      ctx.save();
-      ctx.globalAlpha = opacity;
-
-      // масштабируем watermark так, чтобы он целиком перекрывал страницу
-      const w = watermarkImg.width;
-      const h = watermarkImg.height;
-      const scale = Math.max(width / w, height / h);
-      const dw = w * scale;
-      const dh = h * scale;
-      const dx = (width - dw) / 2;
-      const dy = (height - dh) / 2;
-
-      ctx.drawImage(watermarkImg, dx, dy, dw, dh);
-      ctx.restore();
-    }
-
-    async function drawPreview() {
-      if (basePages.length === 0) return;
-
-      const pageIndex = Math.min(
-        Math.max(parseInt(pageInput.value || "1", 10) - 1, 0),
-        basePages.length - 1
-      );
-      const baseCanvas = basePages[pageIndex];
-
-      const width = baseCanvas.width;
-      const height = baseCanvas.height;
-      const opacity = parseFloat(opacityInput.value);
-
-      previewCanvas.width = width;
-      previewCanvas.height = height;
-
-      const ctx = previewCanvas.getContext("2d");
-      ctx.clearRect(0, 0, width, height);
-      ctx.drawImage(baseCanvas, 0, 0);
-
-      drawWatermark(ctx, width, height, opacity);
-
-      previewTitle.textContent = "Превью — страница " + (pageIndex + 1);
-      previewSize.textContent = width + " x " + height + " px";
-    }
-
-    async function downloadAllPages() {
-      if (basePages.length === 0) return;
-      if (!window.JSZip) {
-        setStatus("JSZip не загрузился, проверь интернет.", true);
-        return;
-      }
-
-      const zip = new JSZip();
-      const opacity = parseFloat(opacityInput.value);
-
-      setStatus("Готовлю JPG и собираю ZIP...", false);
-      downloadBtn.disabled = true;
-
-      try {
-        const tasks = basePages.map((baseCanvas, idx) => {
-          return new Promise(resolve => {
-            const w = baseCanvas.width;
-            const h = baseCanvas.height;
-            const tmp = document.createElement("canvas");
-            const ctx = tmp.getContext("2d");
-            tmp.width = w;
-            tmp.height = h;
-            ctx.drawImage(baseCanvas, 0, 0);
-            drawWatermark(ctx, w, h, opacity);
-
-            tmp.toBlob(blob => {
-              if (blob) {
-                const name = "page_" + (idx + 1) + ".jpg";
-                zip.file(name, blob);
-              }
-              resolve();
-            }, "image/jpeg", 0.9);
-          });
-        });
-
-        await Promise.all(tasks);
-
-        const zipBlob = await zip.generateAsync({ type: "blob" });
-        const url = URL.createObjectURL(zipBlob);
-        const a = document.createElement("a");
-        a.href = url;
-        const cleanName = (currentFileName || "document").replace(/\.[^.]+$/, "");
-        a.download = cleanName + "_watermarked.zip";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        setStatus("ZIP с вотермарками скачан.", false);
-      } catch (e) {
-        console.error(e);
-        setStatus("Ошибка при сборке ZIP: " + (e.message || e), true);
-      } finally {
-        downloadBtn.disabled = false;
-      }
-    }
-
-    // события
-    fileInput.addEventListener("change", e => {
-      const file = e.target.files[0];
-      handleFile(file);
-    });
-
-    opacityInput.addEventListener("input", () => {
-      updateOpacityText();
-      drawPreview();
-    });
-
-    pageInput.addEventListener("change", () => {
-      drawPreview();
-    });
-
-    reloadBtn.addEventListener("click", () => {
-      drawPreview();
-    });
-
-    downloadBtn.addEventListener("click", () => {
-      downloadAllPages();
-    });
-
-    updateOpacityText();
-  </script>
-</body>
-</html>
+        pageInput.val
